@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{BOT_NAME}} · Connect</title>
+<style>
+  :root{--bg:#050b17;--card:#0c1a2e;--line:#16304f;--ice:#7fdcff;--blue:#6b7cff;--text:#e8f3ff;--mute:#8aa4c2;--ok:#43e6a0;--warn:#ffcf5c;--err:#ff6b81}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;display:grid;place-items:center;padding:20px;color:var(--text);
+    font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    background:radial-gradient(900px 500px at 15% -10%,#123a6b55,transparent),radial-gradient(700px 500px at 100% 110%,#3b2d9c44,transparent),var(--bg)}
+  .card{width:100%;max-width:440px;background:linear-gradient(180deg,#0e2038,var(--card));border:1px solid var(--line);
+    border-radius:22px;padding:28px;box-shadow:0 20px 70px #000a,inset 0 1px 0 #ffffff10}
+  .logo{display:flex;align-items:center;gap:12px;margin-bottom:6px}
+  .flake{width:44px;height:44px;border-radius:14px;display:grid;place-items:center;font-size:24px;
+    background:linear-gradient(135deg,var(--ice),var(--blue));box-shadow:0 8px 24px #6b7cff55}
+  h1{margin:0;font-size:22px;letter-spacing:.5px;background:linear-gradient(90deg,var(--ice),var(--blue));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--mute);font-size:13px;margin:0 0 18px}
+  .pill{display:inline-flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;font-size:12px;font-weight:600;background:#ffffff0d;border:1px solid var(--line);margin-bottom:18px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--warn);box-shadow:0 0 10px currentColor}
+  .pill.ok .dot{background:var(--ok)} .pill.err .dot{background:var(--err)}
+  .tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:#071426;border:1px solid var(--line);padding:4px;border-radius:12px;margin-bottom:16px}
+  .tab{border:0;background:transparent;color:var(--mute);padding:10px;border-radius:9px;font-weight:600;cursor:pointer;font-size:14px}
+  .tab.on{background:linear-gradient(135deg,#1a4a7a,#3b3fb0);color:#fff}
+  .panel{display:none}.panel.on{display:block}
+  .qrbox{background:#fff;border-radius:16px;padding:10px;display:grid;place-items:center;min-height:280px}
+  .qrbox img{width:100%;max-width:300px;image-rendering:pixelated}
+  .qrbox .ph{color:#456;font-size:14px;text-align:center;padding:30px}
+  input{width:100%;padding:13px 14px;border-radius:12px;border:1px solid var(--line);background:#071426;color:var(--text);font-size:15px;outline:none}
+  input:focus{border-color:var(--ice)}
+  label{display:block;font-size:12px;color:var(--mute);margin:12px 0 6px}
+  button.go{width:100%;margin-top:12px;padding:13px;border:0;border-radius:12px;font-weight:700;font-size:15px;cursor:pointer;color:#04101f;background:linear-gradient(135deg,var(--ice),#9aa6ff)}
+  button.go:disabled{opacity:.5;cursor:wait}
+  .code{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:34px;letter-spacing:6px;text-align:center;padding:18px;margin-top:14px;
+    border-radius:14px;background:#071426;border:1px dashed var(--ice);color:var(--ice)}
+  ol{color:var(--mute);font-size:13px;line-height:1.7;padding-left:18px;margin:16px 0 0}
+  .msg{font-size:13px;margin-top:10px;min-height:18px;color:var(--warn)}
+  .done{text-align:center;padding:20px 0}.done .big{font-size:54px}.done h2{margin:8px 0 4px}.done p{color:var(--mute);margin:0}
+  .foot{text-align:center;color:#51698a;font-size:12px;margin-top:18px}
+  .hide{display:none!important}
+</style>
+</head>
+<body>
+<main class="card">
+  <div class="logo"><div class="flake">❄</div><div><h1>{{BOT_NAME}}</h1></div></div>
+  <p class="sub">Link your WhatsApp account to start the bot.</p>
+  <div id="pill" class="pill"><span class="dot"></span><span id="pilltxt">Checking…</span></div>
+
+  <section id="gate">
+    <label for="key">Access key (printed in the bot terminal / WEB_KEY)</label>
+    <input id="key" type="password" autocomplete="off" placeholder="Enter access key">
+    <button class="go" id="unlock">Unlock</button>
+    <div class="msg" id="gatemsg"></div>
+  </section>
+
+  <section id="link" class="hide">
+    <div class="tabs">
+      <button class="tab on" data-t="qr">QR code</button>
+      <button class="tab" data-t="pair">Pairing code</button>
+    </div>
+    <div class="panel on" id="p-qr">
+      <div class="qrbox" id="qrbox"><div class="ph">Waiting for QR code…</div></div>
+      <ol><li>Open WhatsApp on your phone</li><li>Tap <b>Linked devices</b> → <b>Link a device</b></li><li>Scan this code</li></ol>
+    </div>
+    <div class="panel" id="p-pair">
+      <label for="num">Phone number with country code (digits only)</label>
+      <input id="num" inputmode="numeric" placeholder="e.g. 254712345678">
+      <button class="go" id="getcode">Get pairing code</button>
+      <div id="code" class="code hide"></div>
+      <div class="msg" id="pairmsg"></div>
+      <ol><li>Open WhatsApp → <b>Linked devices</b></li><li>Tap <b>Link with phone number instead</b></li><li>Type the code shown above</li></ol>
+    </div>
+  </section>
+
+  <section id="done" class="done hide">
+    <div class="big">✅</div><h2>Connected</h2><p id="who"></p>
+  </section>
+  <div class="foot">{{BOT_NAME}} · modular WhatsApp bot</div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+let key=sessionStorage.getItem('fkey')||'';
+const labels={starting:'Starting…',waiting_auth:'Waiting for you to link',connecting:'Connecting…',connected:'Connected',logged_out:'Logged out – restarting',stopped:'Stopped'};
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('on',x===b));
+  $('p-qr').classList.toggle('on',b.dataset.t==='qr');$('p-pair').classList.toggle('on',b.dataset.t==='pair');
+});
+async function api(path,opt={}){
+  const r=await fetch(path,{...opt,headers:{'x-access-key':key,'content-type':'application/json'}});
+  return {ok:r.ok,status:r.status,data:await r.json().catch(()=>({}))};
+}
+$('unlock').onclick=()=>{key=$('key').value.trim();sessionStorage.setItem('fkey',key);poll()};
+$('key').onkeydown=e=>{if(e.key==='Enter')$('unlock').click()};
+$('getcode').onclick=async()=>{
+  $('getcode').disabled=true;$('pairmsg').textContent='';
+  const r=await api('/api/pair',{method:'POST',body:JSON.stringify({number:$('num').value})});
+  $('getcode').disabled=false;
+  if(r.ok){$('code').textContent=r.data.code;$('code').classList.remove('hide')}
+  else $('pairmsg').textContent=r.data.error||'Could not get a code.';
+};
+async function poll(){
+  try{
+    const {data:s,status}=await api('/api/status');
+    const pill=$('pill');
+    $('pilltxt').textContent=labels[s.status]||s.status||'Offline';
+    pill.className='pill '+(s.status==='connected'?'ok':(s.status==='stopped'?'err':''));
+    const connected=s.status==='connected';
+    $('done').classList.toggle('hide',!connected);
+    $('who').textContent=connected&&s.number?('Linked as +'+s.number+' · '+s.commands+' commands loaded'):'';
+    const needsLink=!connected;
+    $('gate').classList.toggle('hide',!needsLink||s.authorised);
+    $('link').classList.toggle('hide',!needsLink||!s.authorised);
+    if(key&&!s.authorised&&needsLink)$('gatemsg').textContent=status===429?'Too many attempts, wait a minute.':'Wrong access key.';
+    if(s.authorised&&s.status==='waiting_auth'){
+      if(s.qr&&!s.pairingCode)$('qrbox').innerHTML='<img alt="QR" src="'+s.qr+'">';
+      else if(s.pairingCode){$('qrbox').innerHTML='<div class="ph">Pairing code requested – use the “Pairing code” tab.</div>';$('code').textContent=s.pairingCode;$('code').classList.remove('hide')}
+    }
+  }catch(e){$('pilltxt').textContent='Offline'}
+}
+poll();setInterval(poll,2500);
+</script>
+</body>
+</html>
