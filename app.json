@@ -1,0 +1,17 @@
+{
+  "name": "FREEZER MD",
+  "description": "Multifunctional WhatsApp bot",
+  "keywords": ["whatsapp", "bot", "baileys"],
+  "buildpacks": [
+    { "url": "heroku/nodejs" },
+    { "url": "heroku/python" },
+    { "url": "https://github.com/jonathanong/heroku-buildpack-ffmpeg-latest" }
+  ],
+  "env": {
+    "OWNER_NUMBER": { "description": "Your number, digits only with country code" },
+    "WEB_KEY": { "description": "Access key for the web connect page" },
+    "SESSION_ID": { "description": "Optional: output of `npm run session`", "required": false },
+    "PREFIX": { "value": "." },
+    "MODE": { "value": "public" }
+  }
+}
