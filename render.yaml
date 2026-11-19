@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: freezer-md
+    runtime: docker
+    plan: starter
+    healthCheckPath: /health
+    disk:
+      name: freezer-data
+      mountPath: /app/session
+      sizeGB: 1
+    envVars:
+      - key: OWNER_NUMBER
+        sync: false
+      - key: WEB_KEY
+        sync: false
+      - key: PREFIX
+        value: "."
