@@ -1,0 +1,26 @@
+{
+  "name": "freezer-md",
+  "version": "1.0.0",
+  "description": "FREEZER MD - modular multifunctional WhatsApp bot (Node.js + Baileys)",
+  "type": "module",
+  "main": "index.js",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js",
+    "check": "node scripts/check-plugins.js",
+    "test": "node --test test/*.test.js",
+    "session": "node scripts/export-session.js"
+  },
+  "dependencies": {
+    "@whiskeysockets/baileys": "^6.7.22",
+    "pino": "^9.6.0",
+    "qrcode": "^1.5.4"
+  },
+  "optionalDependencies": {
+    "sharp": "^0.33.5"
+  }
+}
